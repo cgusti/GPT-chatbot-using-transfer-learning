@@ -19,7 +19,7 @@ You can find our pretrained model checkpoints and configs here in this google dr
 
 https://drive.google.com/drive/folders/1qnyBLT5uObCvhaJJwO2iQiCv-Ww_rnLs?usp=share_link
 
-## Using the interact script 
+## Interact with our fine tuned models 
 
 After downloading model checkpoints into your directory, you can then run the `interact.py` script to interact with one of our pretrained model by setting the model checkpoint command line parameter
 
