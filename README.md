@@ -15,7 +15,7 @@ python -m spacy download en
 
 ## Download Pretrained Models 
 
-You can find our pretrained model checkpoints and configs here in this good drive: 
+You can find our pretrained model checkpoints and configs here in this google drive: 
 
 https://drive.google.com/drive/folders/1qnyBLT5uObCvhaJJwO2iQiCv-Ww_rnLs?usp=share_link
 
