@@ -10,3 +10,7 @@ runs/
 .DS_Store
 gpt_personachat_cache_v2/
 *dataset_cache*
+**Dockerfile
+example_entry.py
+NLP/transfer-learning-conv-ai/dataset_cache_GPT2Tokenizer
+NLP/transfer-learning-conv-ai/dataset_cache_GPT2Tokenizer

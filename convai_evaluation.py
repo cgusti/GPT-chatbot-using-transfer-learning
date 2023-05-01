@@ -24,7 +24,7 @@ from train import build_input_from_segments, pad_dataset, SPECIAL_TOKENS, add_sp
 from utils import download_pretrained_model, AttrDict
 from interact import sample_sequence
 
-class TransformerAgent(Agent):
+class TransformerAgent(Agent): #inherits from Agent, which is a base class for conversational agents in the ParlAI framework
     @staticmethod
     def add_cmdline_args(argparser):
         agent_args = argparser.add_argument_group('Agent parameters')
@@ -55,13 +55,14 @@ class TransformerAgent(Agent):
         torch.random.manual_seed(args.seed)
         torch.cuda.manual_seed(args.seed)
 
+        #initialize tokenizer and model checkpoint/pretrained model
         if shared is None:
             self.logger.info("Get pretrained model and tokenizer")
             if args.model_checkpoint == "":
                 args.model_checkpoint = download_pretrained_model()
             if 'gpt2' in args.model_checkpoint:
                 self.tokenizer = GPT2Tokenizer.from_pretrained(args.model_checkpoint)
-                model_class = GPT2DoubleHeadsModel if self.args.eval_type == "hits@1" else GPT2LMHeadModel
+                model_class = GPT2DoubleHeadsModel if self.args.eval_type == "hits@1" else GPT2LMHeadModel 
             else:
                 self.tokenizer = OpenAIGPTTokenizer.from_pretrained(args.model_checkpoint)
                 model_class = OpenAIGPTDoubleHeadsModel if self.args.eval_type == "hits@1" else OpenAIGPTLMHeadModel
@@ -70,6 +71,7 @@ class TransformerAgent(Agent):
             self.model_checkpoint.to(args.device)
 
             self.logger.info("Build BPE prefix dictionary")
+            #downloads dictionary for the ConvAi2 task and creates a prefix-to-words dictionary from this dictionary
             convai_dict = build_dict()
             assert len(convai_dict) == 19304
             self.prefix2words = self.get_prefix2words(convai_dict)
@@ -87,6 +89,7 @@ class TransformerAgent(Agent):
         self.reset()
 
     def observe(self, observation):
+        '''tis method processes the incoming message and extracts the persona, previous history and candidate responses'''
         if self.episode_done:
             self.reset()
 
@@ -121,6 +124,12 @@ class TransformerAgent(Agent):
         return observation
 
     def act(self):
+        '''
+        This method generates a response to the incoming message (consisting of persona, candidates and candidate responses) using the pre-trained model and returns the response
+        if --eval_type is set to hits@1, the a response using the GPT-2 model with a double-head architecture, which predicts both the next token and the next response, and selects the highest probability
+        candidate reponse. 
+        if --eval_type is set to 'f1' or 'ppl', the 'act' method generates a response using GPT-2 model with the language modeling head, which predicts the next token only
+        '''
         reply = {}
 
         if self.args.eval_type == "hits@1" and len(self.candidates) > 0:
@@ -170,12 +179,17 @@ class TransformerAgent(Agent):
         token_type_ids = torch.tensor(instance["token_type_ids"], device=self.args.device).unsqueeze(0)
 
         with torch.no_grad():
-            logits = self.model_checkpoint(input_ids, token_type_ids=token_type_ids)
-
-        if isinstance(logits, tuple):  # for gpt2 and maybe others
-            logits = logits[0]
-        probs = F.softmax(logits[0, -1], dim=0)
-
+            output = self.model_checkpoint(input_ids, token_type_ids=token_type_ids)
+        # print('printing logits')
+        # print(logits)
+        if isinstance(output, tuple):  # for gpt2 and maybe others
+            # print('if statement has been executed')
+            output = output[0]
+        
+        logits_tensor = torch.tensor(output.logits, dtype=torch.float)
+        # probs = F.softmax(logits[0, -1], dim=0) #there is an issue with this line, so making a correction below 
+        probs = F.softmax(logits_tensor[0, -1], dim=0)
+        
         dist = {}
         for prefix_id, words in self.prefix2words.items():
             for word, ratio in words.items():

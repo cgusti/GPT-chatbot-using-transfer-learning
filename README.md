@@ -1,14 +1,8 @@
-# 🦄 Building a State-of-the-Art Conversational AI with Transfer Learning
-
-The present repo contains the code accompanying the blog post [🦄 How to build a State-of-the-Art Conversational AI with Transfer Learning](https://medium.com/@Thomwolf/how-to-build-a-state-of-the-art-conversational-ai-with-transfer-learning-2d818ac26313).
+# Building a Conversational AI with personality
 
 This code is a clean and commented code base with training and testing scripts that can be used to train a dialog agent leveraging transfer Learning from an OpenAI GPT and GPT-2 Transformer language model.
 
-This codebase can be used to reproduce the results of HuggingFace's participation to NeurIPS 2018 dialog competition [ConvAI2](http://convai.io/) which was state-of-the-art on the automatic metrics. The 3k+ lines of competition code was distilled in about 250 lines of training code with distributed & FP16 options to form the present repository.
-
-This model can be trained in about one hour on a 8 V100 cloud instance (currently costs about $25) and a pre-trained model is also made available.
-
-## Installation
+## Installation and setup 
 
 To install and use the training and inference scripts please clone the repo and install the requirements:
 
@@ -19,34 +13,14 @@ pip install -r requirements.txt
 python -m spacy download en
 ```
 
-## Installation with Docker
-
-To install using docker please build the self-contained image:
+You can then run the `interact.py` script to interact with one of our pretrained model:
 
 ```bash
-docker build -t convai .
-```
 
-_Note: Make sure your Docker setup allocates enough memory to building the container. Building with the default of 1.75GB will fail due to large Pytorch wheel._
-
-You can then enter the image  
-
-```bash
-ip-192-168-22-157:transfer-learning-conv-ai loretoparisi$ docker run --rm -it convai bash
-root@91e241bb823e:/# ls
-Dockerfile  README.md  boot                  dev  home         lib    media  models  proc              root  sbin  sys  train.py  utils.py
-LICENCE     bin        convai_evaluation.py  etc  interact.py  lib64  mnt    opt     requirements.txt  run   srv   tmp  usr       var
-```
-
-You can then run the `interact.py` script on the pretrained model:
-
-```bash
-python3 interact.py --model models/
 ```
 
 ## Pretrained model
 
-We make a pretrained and fine-tuned model available on our S3 [here](https://s3.amazonaws.com/models.huggingface.co/transfer-learning-chatbot/finetuned_chatbot_gpt.tar.gz). The easiest way to download and use this model is just to run the `interact.py` script to talk with the model. Without any argument, this script will automatically download and cache our model.
 
 ## Using the training script
 
@@ -162,8 +136,7 @@ top_p | `float` | `0.9` | Nucleus filtering (top-p) before sampling (`<=0.0`: no
 see `example_entry.py`, and the comment at the top.
 
 ## Citation
-
-If you use this code in your research, you can cite our NeurIPS CAI workshop [paper](http://arxiv.org/abs/1901.08149):
+We give credit to the HuggingFace's participation to NeurIPS 2018 dialog competition [ConvAI2](http://convai.io/) which was state-of-the-art on the automatic metrics, in which a part of the code for this repository was based on. 
 
 ```bash
 @article{DBLP:journals/corr/abs-1901-08149,
