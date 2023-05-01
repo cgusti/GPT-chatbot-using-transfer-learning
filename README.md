@@ -113,7 +113,7 @@ top_p | `float` | `0.9` | Nucleus filtering (top-p) before sampling (`<=0.0`: no
 
 
 ## Citation
-We give credit to the HuggingFace's code from their participation to NeurIPS 2018 dialog competition [ConvAI2](http://convai.io/) which was state-of-the-art on the automatic metrics, in which a part of the code for this repository was based on. 
+We give credit to the HuggingFace's code from their participation to NeurIPS 2018 dialog competition [ConvAI2](http://convai.io/) which was state-of-the-art on the automatic metrics, in which a the train, interact and evaluation scripts were based on.
 
 ```bash
 @article{DBLP:journals/corr/abs-1901-08149,
