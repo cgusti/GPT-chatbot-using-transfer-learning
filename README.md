@@ -7,11 +7,12 @@ This code is a clean and commented code base with training and testing scripts t
 To install and use the training and inference scripts please clone the repo and install the requirements:
 
 ```bash
-git clone https://github.com/huggingface/transfer-learning-conv-ai
-cd transfer-learning-conv-ai
+git clone https://github.com/LMU-CMSI-Korpusik/final-project-ock.git
+cd final-project-ock
 pip install -r requirements.txt
 python -m spacy download en
 ```
+
 
 You can then run the `interact.py` script to interact with one of our pretrained model:
 
@@ -19,8 +20,35 @@ You can then run the `interact.py` script to interact with one of our pretrained
 
 ```
 
-## Pretrained model
+## Download Pretrained Models 
 
+You can find our pretrained model checkpoints and configs here in this good drive: 
+
+https://drive.google.com/drive/folders/1qnyBLT5uObCvhaJJwO2iQiCv-Ww_rnLs?usp=share_link
+
+## Using the interact script 
+
+After downloading model checkpoints into your directory, you can then run the `interact.py` script to interact with one of our pretrained model by setting the model checkpoint command line parameter
+
+Example: 
+
+```bash
+python interact.py --model_checkpoint /home/cgusti/NLP/gpt-3epochs
+```
+Argument | Type | Default value | Description
+---------|------|---------------|------------
+dataset_path | `str` | `""` | Path or url of the dataset. If empty download from S3.
+dataset_cache | `str` | `'./dataset_cache.bin'` | Path or url of the dataset cache
+model | `str` | `"openai-gpt"` | Path, url or short name of the model
+max_history | `int` | `2` | Number of previous utterances to keep in history
+device | `str` | `cuda` if `torch.cuda.is_available()` else `cpu` | Device (cuda or cpu)
+no_sample | action `store_true` | Set to use greedy decoding instead of sampling
+max_length | `int` | `20` | Maximum length of the output utterances
+min_length | `int` | `1` | Minimum length of the output utterances
+seed | `int` | `42` | Seed
+temperature | `int` | `0.7` | Sampling softmax temperature
+top_k | `int` | `0` | Filter top-k tokens before sampling (`<=0`: no filtering)
+top_p | `float` | `0.9` | Nucleus filtering (top-p) before sampling (`<=0.0`: no filtering)
 
 ## Using the training script
 
@@ -53,51 +81,6 @@ device | `str` | `"cuda" if torch.cuda.is_available() else "cpu"` | Device (cuda
 fp16 | `str` | `""` | Set to O0, O1, O2 or O3 for fp16 training (see apex documentation)
 local_rank | `int` | `-1` | Local rank for distributed training (-1: not distributed)
 
-Here is how to reproduce our results on a server with 8 V100 GPUs (adapt number of nodes and batch sizes to your configuration):
-
-```bash
-python -m torch.distributed.launch --nproc_per_node=8 ./train.py --gradient_accumulation_steps=4 --lm_coef=2.0 --max_history=2 --n_epochs=1 --num_candidates=4 --personality_permutations=2 --train_batch_size=2 --valid_batch_size=2
-```
-
-This model should give a Hits@1 over 79, perplexity of 20.5 and F1 of 16.5 using the convai2 evaluation script (see below).
-
-These numbers are slightly lower than the number we obtained in the ConvAI2 competition. Here is what you can tweak to reach the same results:
-
-- in the ConvAI2 competition we also used tweaked position emebddings so that the history of the dialog always start at with the same embeddings. This is easy to add with pytorch-transformers and should improve the hits@1 metric.
-- in the ConvAI2 competition we used a beam search decoder. While the results are better in term of f1 metric, our feeling is that the human experience is less compelling with beam search versus the nucleus sampling detector which is provided in the present repository.
-
-## Using the interaction script
-
-The training script saves all the experiments and checkpoints in a sub-folder named with the timestamp of the experiment in the `./runs` folder of the repository base folder.
-
-You can then use the interactive script to interact with the model simply by pointing to this folder.
-
-Here is an example command line to run the interactive script:
-
-```bash
-python ./interact.py --model_checkpoint ./data/Apr17_13-31-38_thunder/  # run the interactive script with a training checkpoint
-python ./interact.py  # run the interactive script with the finetuned model on our S3
-```
-
-The fine-tuned model will gives FINAL Hits@1: 0.715
-
-The interactive script accept a few arguments to tweak the decoding algorithm:
-
-Argument | Type | Default value | Description
----------|------|---------------|------------
-dataset_path | `str` | `""` | Path or url of the dataset. If empty download from S3.
-dataset_cache | `str` | `'./dataset_cache.bin'` | Path or url of the dataset cache
-model | `str` | `"openai-gpt"` | Path, url or short name of the model
-max_history | `int` | `2` | Number of previous utterances to keep in history
-device | `str` | `cuda` if `torch.cuda.is_available()` else `cpu` | Device (cuda or cpu)
-no_sample | action `store_true` | Set to use greedy decoding instead of sampling
-max_length | `int` | `20` | Maximum length of the output utterances
-min_length | `int` | `1` | Minimum length of the output utterances
-seed | `int` | `42` | Seed
-temperature | `int` | `0.7` | Sampling softmax temperature
-top_k | `int` | `0` | Filter top-k tokens before sampling (`<=0`: no filtering)
-top_p | `float` | `0.9` | Nucleus filtering (top-p) before sampling (`<=0.0`: no filtering)
-
 ## Running ConvAI2 evaluation scripts
 
 To run the evaluation scripts of the ConvAI2 challenge, you first need to install `ParlAI` in the repo base folder like this:
@@ -112,7 +95,6 @@ You can then run the evaluation script from `ParlAI` base folder:
 
 ```bash
 cd ParlAI
-python ../convai_evaluation.py --eval_type hits@1  # to download and evaluate our fine-tuned model on hits@1 metric
 python ../convai_evaluation.py --eval_type hits@1  --model_checkpoint ./data/Apr17_13-31-38_thunder/  # to evaluate a training checkpoint on hits@1 metric
 ```
 
@@ -132,11 +114,10 @@ temperature | `int` | `0.7` | Sampling softmax temperature
 top_k | `int` | `0` | Filter top-k tokens before sampling (`<=0`: no filtering)
 top_p | `float` | `0.9` | Nucleus filtering (top-p) before sampling (`<=0.0`: no filtering)
 
-## Data Format
-see `example_entry.py`, and the comment at the top.
+
 
 ## Citation
-We give credit to the HuggingFace's participation to NeurIPS 2018 dialog competition [ConvAI2](http://convai.io/) which was state-of-the-art on the automatic metrics, in which a part of the code for this repository was based on. 
+We give credit to the HuggingFace's code from their participation to NeurIPS 2018 dialog competition [ConvAI2](http://convai.io/) which was state-of-the-art on the automatic metrics, in which a part of the code for this repository was based on. 
 
 ```bash
 @article{DBLP:journals/corr/abs-1901-08149,
