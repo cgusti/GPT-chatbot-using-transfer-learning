@@ -28,6 +28,9 @@ Example:
 ```bash
 python interact.py --model_checkpoint /home/cgusti/NLP/gpt-3epochs
 ```
+
+There are a couple of hyperparameters that you can for the decoder in interact.py
+
 Argument | Type | Default value | Description
 ---------|------|---------------|------------
 dataset_path | `str` | `""` | Path or url of the dataset. If empty download from S3.
