@@ -13,13 +13,6 @@ pip install -r requirements.txt
 python -m spacy download en
 ```
 
-
-You can then run the `interact.py` script to interact with one of our pretrained model:
-
-```bash
-
-```
-
 ## Download Pretrained Models 
 
 You can find our pretrained model checkpoints and configs here in this good drive: 
