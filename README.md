@@ -1,6 +1,6 @@
 # Building a Conversational AI with personality
 
-This code is a clean and commented code base with training and testing scripts that can be used to train a dialog agent leveraging transfer Learning from an OpenAI GPT and GPT-2 Transformer language model, using a personality dataset, PersonaChat
+This code is a clean and commented code base with training and testing scripts that can be used to train a dialog agent leveraging transfer Learning from an OpenAI GPT and GPT-2 Transformer language model, using a personality dataset, PersonaChat. This repository was created for our final NLP project. 
 
 ## Installation and setup 
 
